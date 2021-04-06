@@ -16,6 +16,12 @@ const AnimatedViewPagerAndroid = Platform.OS === 'android' ?
     Animated.createAnimatedComponent(ViewPagerAndroid) :
     undefined;
 
+// 切换方式
+const ChangeType = {
+    clickType: 1, // 点击切换
+    scrolltype: 2, // 滑动切换
+}
+
 export default class TabView extends React.PureComponent {
     static propTypes = {
         ...TabViewProps,
@@ -293,7 +299,7 @@ export default class TabView extends React.PureComponent {
         } else {
             this.getPagerNode() && this.getPagerNode().setPage(index);
         }
-        this.sceneWillShow(index)
+        this.sceneWillShow(index, ChangeType.clickType)
     }
 
     /**
@@ -310,12 +316,12 @@ export default class TabView extends React.PureComponent {
     * 显示页面发生变化
     */
     pageHasChange(page) {
-        this.sceneWillShow(page)
+        this.sceneWillShow(page, ChangeType.scrolltype)
     }
     /**
     * 页面将要显示
     */
-    sceneWillShow(page) {
+    sceneWillShow(page, onChangeTab = 0) {
 
         let zPage = page;
         if (typeof page === 'object') {
@@ -323,16 +329,16 @@ export default class TabView extends React.PureComponent {
         }
         const { currentIndex } = this.state;
 
-        this.updateDisplayScene(zPage, this.onChangeTab.bind(this, currentIndex, zPage))
+        this.updateDisplayScene(zPage, this.onChangeTab.bind(this, currentIndex, zPage, onChangeTab))
     }
 
     /**
     * tabbar切换
     */
-    onChangeTab(currentIndex, page) {
+    onChangeTab(currentIndex, page, changeType) {
         if (currentIndex === page) return;
         if (this.props.onChangeTab) {
-            this.props.onChangeTab({ from: currentIndex, curIndex: page })
+            this.props.onChangeTab({ from: currentIndex, curIndex: page, changeType: changeType })
         }
     }
 
